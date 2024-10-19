@@ -5,6 +5,7 @@
 ### В консоли
 
 ```bash
+pytrhon preprocess.py
 python tuning.py
 python main.py
 
