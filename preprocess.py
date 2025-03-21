@@ -3,15 +3,12 @@ import random as rd
 
 
 def merge_task_to_solution(path_to_solutions: str, path_to_tasks: str, save_to: str) -> None:
-    # Load the Excel files
     solution_df = pd.read_excel(path_to_solutions)
     task_df = pd.read_excel(path_to_tasks)
 
-    # Merge the dataframes on the task_id in solution_df and id in task_df
     merged_df = pd.merge(solution_df, task_df, left_on='task_id', right_on='id', how='left')
     merged_df.rename(columns={'id_x': 'id'}, inplace=True)
 
-    # Save the resulting dataframe to a new Excel file
     merged_df.to_excel(save_to, index=False)
 
 
