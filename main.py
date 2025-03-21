@@ -48,22 +48,9 @@ if __name__ == "__main__":
     examples = format_few_shot_examples("./data/processed/train/solutions.xlsx", system_prompt,
                                         example_ratio=0.005)
 
-
-
-#    def predict(row: pd.Series) -> str:
-#        sleep(1)  # YandexGPT has a speed limit and this seems to be ok
-#
-#        res = yandex_gpt.get_sync_completion(messages=examples + [
-#            {'role': 'system', 'text': system_prompt.format(row["description"], row["author_solution"])},
-#            {'role': "user", 'text': "Ошибочное решение студента:" + row["student_solution"]}
-#        ])
-#        return "Ошибка в открытых и скрытых тестах. " + res
-
     def load_pretrained_weights(model, weights_path):
-        # Загружаем состояние из файла
         training_state = torch.load(weights_path, weights_only= True)
         
-        # Извлекаем только параметры модели
         model.load_state_dict(training_state['model_state_dict'])
         model.eval()
 
@@ -71,11 +58,8 @@ if __name__ == "__main__":
         sleep(1)  # YandexGPT has a speed limit and this seems to be ok
         scores = []
         results = []
-        
-        # Инициализация RegressionHead
+
         regression_head = RegressionHead()
-        
-        # Загрузка предобученных весов
         load_pretrained_weights(regression_head, weights_path='./data/complete/regression_head.pt')
         
         model_name = "DeepPavlov/rubert-base-cased-sentence"
@@ -95,7 +79,7 @@ if __name__ == "__main__":
                 
                 res_embedded = get_sentence_embedding(res)
                 
-                scores.append(regression_head(res_embedded))  # Используйте regression_head для получения оценок
+                scores.append(regression_head(res_embedded)) 
                 results.append(res)
         
         idx = scores.index(max(scores))
