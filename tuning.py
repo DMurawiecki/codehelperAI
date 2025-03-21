@@ -47,10 +47,7 @@ if __name__ == "__main__":
         api_key=os.environ["YANDEX_GPT_API_KEY"]
     )
     yandex_gpt = YandexGPT(config_manager=config)
-
-#    examples = format_few_shot_examples("./data/processed/train/solutions.xlsx", system_prompt,
-#                                        example_ratio=0.005)
-#                                        
+                                     
     model_name = "DeepPavlov/rubert-base-cased-sentence"
     tokenizer = BertTokenizer.from_pretrained(model_name)
     model = BertModel.from_pretrained(model_name)
@@ -58,8 +55,6 @@ if __name__ == "__main__":
     def save_model(model, path):
         training_state = {
                         "model_state_dict": model.state_dict(),
-                        # "optimizer_state_dict": optimizer.state_dict(),
-                        # "train_step": i,
                     }
         torch.save(training_state, path)
         print('Model was saved')
@@ -67,7 +62,6 @@ if __name__ == "__main__":
 
     def predict(row: pd.Series) -> str:
         sleep(1)  # YandexGPT has a speed limit and this seems to be ok
-        #TODO examples
         res = yandex_gpt.get_sync_completion(messages= [
             {'role': 'system', 'text': system_prompt.format(row["description"], row["author_solution"])},
             {'role': "user", 'text': "Ошибочное решение студента:" + row["student_solution"]}
@@ -84,25 +78,17 @@ if __name__ == "__main__":
                
                 inputs_embedded = [get_sentence_embedding(str(i)) for i in inputs1]
                 
-                # Преобразуем список векторов в тензор
                 inputs_embedded_tensor = torch.stack([embedding.clone().detach().requires_grad_(True) for embedding in inputs_embedded]).float()
                 target_embedded = [t for t in target]
                 target_embedded_tensor = torch.stack([embedding.clone().detach() for embedding in target_embedded]).float()
 
-                
-                # Вычисляем косинусную близость
-#                cs_true = cosine_similarity(inputs_embedded_tensor.detach().numpy(), target_embedded_tensor.detach().numpy())
                 cs_true = F.cosine_similarity(inputs_embedded_tensor, target_embedded_tensor)
                 cs_true_tensor = cs_true.clone().detach().requires_grad_(True).float()
                 
-                # Получаем выходы модели
                 outputs = model(inputs_embedded_tensor)
                 
-                # Вычисляем лосс
-#                loss = F.mse_loss(outputs.squeeze(), cs_true_tensor.mean(dim=1))
                 loss = F.mse_loss(outputs.squeeze(), cs_true_tensor.squeeze())
                 
-                # Обратное распространение и шаг оптимизации
                 loss.backward()
                 optimizer.step()
 
@@ -118,8 +104,7 @@ if __name__ == "__main__":
             return len(self.dataframe)
 
         def __getitem__(self, idx):
-            # Получаем входные данные и целевое значение
-            features = self.dataframe['inputs'][idx]  # Предполагается, что 'inputs' в первой колонке
+            features = self.dataframe['inputs'][idx]  
             target = string2embedding(self.dataframe['target'][idx])
             return features, target
         
