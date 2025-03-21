@@ -11,7 +11,7 @@ class YandexGPT(BaseModel):
 
     model_urls = {
         "lite": "gpt://{}/yandexgpt-lite/latest",
-        "pro": "gpt://{}/yandexgpt/latest",  # Restricted by competition rules, but you can test accuracy with it
+        "pro": "gpt://{}/yandexgpt/latest", 
     }
 
     def __init__(
