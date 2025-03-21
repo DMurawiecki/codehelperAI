@@ -11,7 +11,6 @@ from regression_head import RegressionHead
 from app.utils.submit import get_sentence_embedding
 from transformers import BertModel, BertTokenizer
 from torch.utils.data import Dataset, DataLoader
-#from sklearn import cosine_similarity
 import torch.nn.functional as F
 import torch
 
